@@ -50,6 +50,20 @@
       this.gates.push(gate);
     };
     
+    // Find a gate
+    this.find = function(q){
+      // Loop through gates and find the 'one'
+      for (var i=0; i < self.gates.length; i++) {
+        var gate = self.gates[i];
+        if(gate.path == q){
+          return gate;
+        }
+      };
+      
+      // If we couldn't find it, throw an error
+      throw("route for "+q+" was not found.");
+    };
+    
     // Setup basic routes
     this.routes = function(routes){
       for (var i=0; i < routes.length; i++){
@@ -60,6 +74,14 @@
         self.newGate(path, template);
       };
     };
+    
+    this.route = function(path){
+      var route = self.find(path);
+    };
+    
+    $(window).on('hashchange', function(){
+      self.route(wdinow.location.hash);
+    });
   };
   return Gates;
 })(jQuery);
