@@ -16,6 +16,8 @@
   function Gate(path, template){
     this.path = path;
     this.template =  template;
+    
+
   }
   
   // Main Gates contructor
@@ -43,6 +45,7 @@
       } else {
         template = self.defaultTemplate();
       }
+      
       // Create a new gate
       var gate = new Gate(path, template);
       
@@ -64,23 +67,44 @@
       throw("route for "+q+" was not found.");
     };
     
+    // Route to page
+    this.route = function(path){
+      // First, find that route
+      var route = self.find(path);
+      
+      if(route){
+        // Get the template file
+        $.ajax({
+          url: route.template.path,
+          method: 'GET',
+          success: function(response){
+            $('*[data-gates-template]').append(response);
+          },
+          error: function(){
+            
+          }
+        });
+      }
+    };
+    
     // Setup basic routes
     this.routes = function(routes){
       for (var i=0; i < routes.length; i++){
         var path = routes[i];
-        var template = this.defaultTemplate();
         
         // Create the gate
-        self.newGate(path, template);
+        self.newGate(path);
       };
+      
+      // Run at load
+      self.route(currentRoute);
     };
     
-    this.route = function(path){
-      var route = self.find(path);
-    };
+    // Get the route from url
+    var currentRoute = window.location.hash.replace("#", '');
     
     $(window).on('hashchange', function(){
-      self.route(wdinow.location.hash);
+      self.route(currentRoute);
     });
   };
   return Gates;

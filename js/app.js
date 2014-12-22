@@ -5,7 +5,7 @@ var app;
   
   app.defaultTemplate('templates/basic.html');
   
-  app.routes(['home', 'about', 'contact', 'portfolio']);
+  app.routes(['home.html']);
   
   console.log(app);
 })();
