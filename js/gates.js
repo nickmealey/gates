@@ -28,14 +28,19 @@
     
     // Set base template
     this.defaultTemplate = function(template){
-      self._defaultTemplate = new Template(template);
+      if(template){
+        self.template = new Template(template);
+      }
+      
+      return self.template;
     }
     
     // Setup basic routes
     this.routes = function(routes){
       for (var i=0; i < routes.length; i++){
         var route = routes[i];
-        this.gates.push(new Gate(route, self._defaultTemplate));
+        var template = this.defaultTemplate();
+        this.gates.push(new Gate(route, template));
       };
     };
   };
