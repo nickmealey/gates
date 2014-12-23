@@ -73,15 +73,65 @@
       var route = self.find(path);
       
       if(route){
+        
+        // Get view file
+        function getView(callback){
+          $.ajax({
+            url: "views/" + route.path,
+            method: 'GET',
+            success: function(response){
+              callback(response);
+            },
+            error: function(err){
+              console.log(err);
+            }
+          });
+        }
+        
+        // Get a partial
+        function getPartial(path, callback){
+          $.ajax({
+            url: path,
+            method: 'GET',
+            success: function(response){
+              callback(response);
+            },
+            error: function(err){
+              console.log(err);
+            }
+          });
+        }
+        
+        
         // Get the template file
         $.ajax({
           url: route.template.path,
           method: 'GET',
-          success: function(response){
-            $('*[data-gates-template]').append(response);
-          },
-          error: function(){
+          success: function(templateResponse){
+            // Get the view
+            getView(function(viewResponse){
+              // Set template
+              var template = $('<div/>').html(templateResponse);
+              
+              // Set view
+              var view = template.find('*[data-gates-render]').html(viewResponse).end();
+              
+              // Append it all to the page
+              $('*[data-gates-template]').html(view)
+              
+              // Find any partials
+              .find('*[data-gates-partial]').each(function(index, _partial){
+                var path = $(this).attr('data-gates-partial');
+                getPartial(path, function(partialResponse){
+                  $(_partial).html(partialResponse);
+                });
+              });
+            });
             
+            
+          },
+          error: function(err){
+            console.log(err);
           }
         });
       }
@@ -96,7 +146,6 @@
         self.newGate(path);
       };
       
-      // Run at load
       self.route(currentRoute);
     };
     
