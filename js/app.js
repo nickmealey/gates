@@ -5,9 +5,11 @@ var app;
   
   app.defaultTemplate('templates/basic');
   
-  app.routes(['home', 'about', 'contact']);
+  app.routes(['about', 'contact']);
   
-  app.newGate('blog', 'templates/minimal');
+  app.gate('', 'home');
+  
+  app.gate('blog', 'templates/minimal');
   
   app.init();
 })();

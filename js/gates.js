@@ -13,8 +13,14 @@
   }
   
   // Create a new gate
-  function Gate(path, template){
+  function Gate(route, path, template){
+    // The input route
+    this.route = route;
+    
+    // The path to the view
     this.path = path;
+    
+    // The path to the teplate file
     this.template =  template;
     
 
@@ -25,8 +31,14 @@
     // Self object
     self = this;
     
+    // Default prefix for routes
+    this.prefix = "/";
+    
     // Default extension
     this.extension = ".html";
+    
+    // Default path for views
+    this.viewsPath = "views/";
     
     // A collection of gates
     this.gates = [];
@@ -43,8 +55,13 @@
       return self.template;
     };
     
+    // Formates true path of a route
+    function formatPath(route){
+      return route + self.extension;
+    }
+    
     // Create a gate
-    this.newGate = function(path, template){
+    this.gate = function(route, path, template){
       // Check if a template was given, if not set from default
       if(template){
         template = new Template(template);
@@ -52,8 +69,12 @@
         template = self.defaultTemplate();
       }
       
+      if(!path){
+        path = route;
+      }
+      
       // Create a new gate
-      var gate = new Gate(path, template);
+      var gate = new Gate(route, path, template);
       
       // Push it to gates
       this.gates.push(gate);
@@ -64,7 +85,7 @@
       // Loop through gates and find the 'one'
       for (var i=0; i < self.gates.length; i++) {
         var gate = self.gates[i];
-        if(gate.path == q){
+        if(gate.route == q){
           return gate;
         }
       };
@@ -74,16 +95,16 @@
     };
     
     // Route to page
-    this.route = function(path){
+    this.route = function(route){
       // First, find that route
-      var route = self.find(path);
+      var route = self.find(route);
       
       if(route){
         
         // Get view file
         function getView(callback){
           $.ajax({
-            url: "views/" + route.path + self.extension,
+            url: self.viewsPath + formatPath(route.path),
             method: 'GET',
             success: function(response){
               callback(response);
@@ -98,7 +119,7 @@
         function getPartial(path, callback){
           // Check if we've already loaded this partial
           $.ajax({
-            url: path + self.extension,
+            url: formatPath(path),
             method: 'GET',
             success: function(response){
               callback(response);
@@ -114,7 +135,7 @@
           if(path != self.activeTemplate){
             // Get the template file
             $.ajax({
-              url: path,
+              url: formatPath(path),
               method: 'GET',
               success: function(response){
                 callback(response);
@@ -141,10 +162,8 @@
           });
         }
         
-        var path = route.template.path + self.extension;
-        
         // Make it all happen
-        getTemplate(path, function(templateResponse){
+        getTemplate(route.template.path, function(templateResponse){
           // Check first if template is being used
           if(templateResponse){
             var template = $('<wrapper/>').html(templateResponse);
@@ -190,7 +209,7 @@
         var path = routes[i];
         
         // Create the gate
-        self.newGate(path);
+        self.gate(path);
       };
     };
     
