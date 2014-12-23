@@ -111,10 +111,13 @@
             // Get the view
             getView(function(viewResponse){
               // Set template
-              var template = $('<div/>').html(templateResponse);
+              var template = $('<wrapper/>').html(templateResponse);
               
               // Set view
               var view = template.find('*[data-gates-render]').html(viewResponse).end();
+              
+              // Remove the wrapper we created
+              view = view.children();
               
               // Append it all to the page
               $('*[data-gates-template]').html(view)
