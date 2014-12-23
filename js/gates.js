@@ -192,8 +192,6 @@
         // Create the gate
         self.newGate(path);
       };
-      
-      self.route(currentRoute());
     };
     
     // Get the route from url
@@ -204,6 +202,10 @@
     $(window).on('hashchange', function(){1
       self.route(currentRoute());
     });
+    
+    this.init = function(){
+      self.route(currentRoute());
+    };
   };
   return Gates;
 })(jQuery);

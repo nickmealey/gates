@@ -6,4 +6,8 @@ var app;
   app.defaultTemplate('templates/basic');
   
   app.routes(['home', 'about', 'contact']);
+  
+  app.newGate('blog', 'templates/minimal');
+  
+  app.init();
 })();
