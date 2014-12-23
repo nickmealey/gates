@@ -25,8 +25,14 @@
     // Self object
     self = this;
     
+    // Default extension
+    this.extension = ".html";
+    
     // A collection of gates
     this.gates = [];
+    
+    // The current template being displayed
+    this.activeTemplate;
     
     // Set base template
     this.defaultTemplate = function(template){
@@ -77,7 +83,7 @@
         // Get view file
         function getView(callback){
           $.ajax({
-            url: "views/" + route.path,
+            url: "views/" + route.path + self.extension,
             method: 'GET',
             success: function(response){
               callback(response);
@@ -90,8 +96,9 @@
         
         // Get a partial
         function getPartial(path, callback){
+          // Check if we've already loaded this partial
           $.ajax({
-            url: path,
+            url: path + self.extension,
             method: 'GET',
             success: function(response){
               callback(response);
@@ -102,41 +109,78 @@
           });
         }
         
-        
-        // Get the template file
-        $.ajax({
-          url: route.template.path,
-          method: 'GET',
-          success: function(templateResponse){
-            // Get the view
-            getView(function(viewResponse){
-              // Set template
-              var template = $('<wrapper/>').html(templateResponse);
-              
-              // Set view
-              var view = template.find('*[data-gates-render]').html(viewResponse).end();
-              
-              // Remove the wrapper we created
-              view = view.children();
-              
-              // Append it all to the page
-              $('*[data-gates-template]').html(view)
-              
-              // Find any partials
-              .find('*[data-gates-partial]').each(function(index, _partial){
-                var path = $(this).attr('data-gates-partial');
-                getPartial(path, function(partialResponse){
-                  $(_partial).html(partialResponse);
-                });
-              });
+        // Get a template
+        function getTemplate(path, callback){
+          if(path != self.activeTemplate){
+            // Get the template file
+            $.ajax({
+              url: path,
+              method: 'GET',
+              success: function(response){
+                callback(response);
+                self.activeTemplate = path;
+              },
+              error: function(err){
+                console.log(err);
+              }
             });
-            
-            
-          },
-          error: function(err){
-            console.log(err);
+          } else {
+            callback(false);
           }
-        });
+        } // End getTemplate
+        
+        // Find and set any partials inside container
+        function findPartials(elem){
+          console.log(elem[0]);
+          elem.find('*[data-gates-partial]').each(function(index, _partial){
+            var path = $(this).attr('data-gates-partial');
+            getPartial(path, function(partialResponse){
+                $(_partial).html(partialResponse);
+              
+            });
+          });
+        }
+        
+        var path = route.template.path + self.extension;
+        
+        // Make it all happen
+        getTemplate(path, function(templateResponse){
+          // Check first if template is being used
+          if(templateResponse){
+            var template = $('<wrapper/>').html(templateResponse);
+            
+            // Find any partials
+            findPartials(template);
+            
+          } else {
+            var template = $('*[data-gates-template]');
+          }
+          
+          // Get the view
+          getView(function(viewResponse){
+
+
+            // Set view
+            var render = template.find('*[data-gates-render]');
+            
+            // Set view
+            var view = render.html(viewResponse).end();
+            
+            // Find partials
+            findPartials(render)
+            
+            // Remove the wrapper we created
+            view = view.children();
+
+            // Append it all to the page
+            $('*[data-gates-template]').html(view)
+
+            
+
+          }); // End getView
+        }); //end getTemplate
+        
+        
       }
     };
     
@@ -149,14 +193,16 @@
         self.newGate(path);
       };
       
-      self.route(currentRoute);
+      self.route(currentRoute());
     };
     
     // Get the route from url
-    var currentRoute = window.location.hash.replace("#", '');
+    var currentRoute = function(){
+      return window.location.hash.replace("#", '');
+    }
     
-    $(window).on('hashchange', function(){
-      self.route(currentRoute);
+    $(window).on('hashchange', function(){1
+      self.route(currentRoute());
     });
   };
   return Gates;
