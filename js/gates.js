@@ -78,10 +78,17 @@
       
       // Push it to gates
       this.gates.push(gate);
+      
+      console.log(currentRoute())
+      // Check if this gate is the current route
+      if (self.find(route).route == currentRoute()){
+        self.route(currentRoute());
+      }
     };
     
     // Find a gate
     this.find = function(q){
+      
       // Loop through gates and find the 'one'
       for (var i=0; i < self.gates.length; i++) {
         var gate = self.gates[i];
@@ -91,15 +98,26 @@
       };
       
       // If we couldn't find it, throw an error
-      throw("route for "+q+" was not found.");
+      console.log("route for \""+q+"\" was not found.");
     };
     
     // Route to page
     this.route = function(route){
+      // If route is empty, set to a slash
+      if(!route) {
+        route = "/";
+      }
+      
+      // If the route doesn't begin with a slash, don't do it
+      if(!/^\//.test(route)){
+        throw("Not a valid route");
+        return false;
+      }
+      
       // First, find that route
       var route = self.find(route);
       
-      if(route){
+      if(route) {
         
         // Get view file
         function getView(callback){
@@ -221,10 +239,6 @@
     $(window).on('hashchange', function(){1
       self.route(currentRoute());
     });
-    
-    this.init = function(){
-      self.route(currentRoute());
-    };
   };
   return Gates;
 })(jQuery);

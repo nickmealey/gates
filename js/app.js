@@ -5,11 +5,9 @@ var app;
   
   app.defaultTemplate('templates/basic');
   
-  app.routes(['about', 'contact']);
+  app.routes(['/about', '/contact']);
   
-  app.gate('', 'home');
+  app.gate('/', 'home');
   
   app.gate('blog', 'templates/minimal');
-  
-  app.init();
 })();
