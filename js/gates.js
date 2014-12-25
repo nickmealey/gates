@@ -7,6 +7,11 @@
     throw "Gates requires jQuery as a dependency";
   }
   
+  // Format route
+  function formatRoute(route) {
+    return "/" + route.replace(/^\//, "");
+  }
+  
   // Template object
   function Template(path){
     this.path = path;
@@ -15,7 +20,7 @@
   // Create a new gate
   function Gate(route, path, template){
     // The input route
-    this.route = route;
+    this.route = formatRoute(route);
     
     // The path to the view
     this.path = path;
@@ -30,9 +35,6 @@
   Gates = function(){
     // Self object
     self = this;
-    
-    // Default prefix for routes
-    this.prefix = "/";
     
     // Default extension
     this.extension = ".html";
@@ -62,6 +64,9 @@
     
     // Create a gate
     this.gate = function(route, path, template){
+      // Format the route
+      route = formatRoute(route);
+      
       // Check if a template was given, if not set from default
       if(template){
         template = new Template(template);
@@ -79,7 +84,6 @@
       // Push it to gates
       this.gates.push(gate);
       
-      console.log(currentRoute())
       // Check if this gate is the current route
       if (self.find(route).route == currentRoute()){
         self.route(currentRoute());
@@ -88,6 +92,8 @@
     
     // Find a gate
     this.find = function(q){
+      // Format search
+      q = formatRoute(q);
       
       // Loop through gates and find the 'one'
       for (var i=0; i < self.gates.length; i++) {
@@ -103,16 +109,9 @@
     
     // Route to page
     this.route = function(route){
-      // If route is empty, set to a slash
-      if(!route) {
-        route = "/";
-      }
       
       // If the route doesn't begin with a slash, don't do it
-      if(!/^\//.test(route)){
-        throw("Not a valid route");
-        return false;
-      }
+      route = formatRoute(route);
       
       // First, find that route
       var route = self.find(route);
