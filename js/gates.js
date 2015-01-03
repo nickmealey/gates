@@ -27,7 +27,6 @@
     
     // The path to the teplate file
     this.template =  template;
-    
 
   }
   
@@ -36,11 +35,20 @@
     // Self object
     self = this;
     
-    // Default extension
-    this.extension = ".html";
+    // Default options
+    this.defaults = {
+      extension: ".html",
+      viewsPath: "views/",
+      transitionSpeed: 300,
+      transition: false
+    };
     
-    // Default path for views
-    this.viewsPath = "views/";
+    // Set options
+    this.options = function(options){
+      if(options){
+        return $.extend(self.defaults, options);
+      }
+    }
     
     // A collection of gates
     this.gates = [];
@@ -59,7 +67,7 @@
     
     // Formates true path of a route
     function formatPath(route){
-      return route + self.extension;
+      return route + self.defaults.extension;
     }
     
     // Create a gate
@@ -116,10 +124,15 @@
       
       if(route) {
         
+        // Set no cache
+        $.ajaxSetup({
+          cache: false
+        });
+        
         // Get view file
         function getView(callback){
           $.ajax({
-            url: self.viewsPath + formatPath(route.path),
+            url: self.defaults.viewsPath + formatPath(route.path),
             method: 'GET',
             success: function(response){
               callback(response);
@@ -167,12 +180,10 @@
         
         // Find and set any partials inside container
         function findPartials(elem){
-          console.log(elem[0]);
           elem.find('*[data-gates-partial]').each(function(index, _partial){
             var path = $(this).attr('data-gates-partial');
             getPartial(path, function(partialResponse){
                 $(_partial).html(partialResponse);
-              
             });
           });
         }
@@ -192,8 +203,7 @@
           
           // Get the view
           getView(function(viewResponse){
-
-
+            
             // Set view
             var render = template.find('*[data-gates-render]');
             
@@ -208,8 +218,13 @@
 
             // Append it all to the page
             $('*[data-gates-template]').html(view)
-
             
+            // Check for transitions
+            switch(self.defaults.transition){
+              case 'fade':
+                render.hide().fadeIn(self.defaults.transitionSpeed);
+                break;
+            }
 
           }); // End getView
         }); //end getTemplate
@@ -243,7 +258,9 @@
   };
   
   // On first load, forward to root
-  window.location.hash = "/";
+  if(!window.location.hash){
+    window.location.hash = "/";
+  }
   
   return Gates;
 })(jQuery);

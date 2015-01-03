@@ -5,6 +5,10 @@ var app;
   
   app.defaultTemplate('templates/basic');
   
+  app.options({
+    transition: 'fade',
+    transitionSpeed: 300
+  });
   app.routes(['/about', '/contact']);
   
   app.gate('/', 'home');
