@@ -9,5 +9,5 @@ var app;
   
   app.gate('/', 'home');
   
-  app.gate('blog', 'templates/minimal');
+  app.gate('/blog', 'blog', 'templates/minimal');
 })();

@@ -109,8 +109,6 @@
     
     // Route to page
     this.route = function(route){
-      
-      // If the route doesn't begin with a slash, don't do it
       route = formatRoute(route);
       
       // First, find that route
@@ -235,9 +233,17 @@
       return window.location.hash.replace("#", '');
     }
     
-    $(window).on('hashchange', function(){1
-      self.route(currentRoute());
+    $(window).on('hashchange', function(){
+      // Only route if the hash begins with a slash
+      var route = currentRoute();
+      if(/^\//.test(route)){
+        self.route(route);
+      }
     });
   };
+  
+  // On first load, forward to root
+  window.location.hash = "/";
+  
   return Gates;
 })(jQuery);
