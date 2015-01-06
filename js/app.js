@@ -1,7 +1,7 @@
 var app;
 
 (function(){
-  app = new Gates();
+  app = new Gates;
   
   app.defaultTemplate('templates/basic');
   
@@ -9,6 +9,7 @@ var app;
     transition: 'fade',
     transitionSpeed: 300
   });
+  
   app.routes(['/about', '/contact']);
   
   app.gate('/', 'home');
